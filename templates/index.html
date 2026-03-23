@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Gesture Volume Control</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<h1>Gesture Volume Control</h1>
+
+<div class="buttons">
+
+<button class="start-btn" onclick="startCamera()">Start</button>
+<button class="stop-btn" onclick="stopCamera()">Stop</button>
+
+</div>
+
+<div id="cameraSection" style="display: none;">
+
+    <h2>Webcam Preview</h2>
+
+    <div class="cam-container">
+        <div class="cam">
+            <img id="video" width="500">
+        </div>
+
+
+        <div class="volume-vertical" id="volumeBox" style="display:none;">
+            <div id="volume-fill"></div>
+        </div>
+    </div>
+
+    <h2>Volume : <span id="vol">0</span>%</h2>
+    <div class="bar">
+    <div id="progress">
+</div>
+
+</div>
+
+
+<div class="guide">
+    <h2>🖐 Gesture Guide</h2>
+    
+    <div class="gesture-box">
+        <p>🤏 Thumb & Index Close</p>
+        <span>Decrease Volume 🔉</span>
+    </div>
+
+    <div class="gesture-box">
+        <p>👌 Thumb & Index Apart</p>
+        <span>Increase Volume 🔊</span>
+    </div>
+</div>
+
+
+
+<script>
+
+function startCamera(){
+    fetch("/start");  
+
+    document.getElementById("video").src = "/video";
+
+    document.getElementById("cameraSection").style.display = "block";
+
+    document.querySelector(".start-btn").disabled = true;
+    document.querySelector(".stop-btn").disabled = false;
+}
+
+function stopCamera(){
+    fetch("/stop");
+    document.getElementById("video").src="";
+
+    // hide volume bar
+    document.getElementById("cameraSection").style.display = "none";
+
+    // button control
+    document.querySelector(".start-btn").disabled = false;
+    document.querySelector(".stop-btn").disabled = true;
+}
+setInterval(() => {
+    fetch("/volume")
+    .then(res => res.json())
+    .then(data => {
+
+        let vol = data.volume;
+
+        document.getElementById("vol").innerText = vol;
+        document.getElementById("progress").style.width = vol + "%";
+        document.getElementById("volume-fill").style.height = vol + "%";
+
+    });
+}, 500);
+
+document.querySelector(".stop-btn").disabled = true
+
+
+</script>
+
+</body>
+</html>
