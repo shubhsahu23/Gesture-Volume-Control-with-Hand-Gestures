@@ -1,6 +1,6 @@
 from flask import Flask, render_template, Response, jsonify
 import cv2
-from gesture import process_frame, gesture, status
+import gesture
 from pycaw.pycaw import AudioUtilities
 import webbrowser
 import threading
@@ -24,7 +24,7 @@ def generate_frames():
         if not success:
             break
 
-        frame = process_frame(frame)
+        frame = gesture.process_frame(frame)
 
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
@@ -70,9 +70,14 @@ def volume():
 @app.route("/gesture")
 def get_gesture():
     return jsonify({
-        "gesture": gesture,
-        "status": status
+        "gesture": gesture.gesture,
+        "status": gesture.status
     })
+
+
+@app.route("/fps")
+def get_fps():
+    return jsonify({"fps": int(gesture.fps)})
 
 
 if __name__ == "__main__":

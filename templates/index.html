@@ -1,104 +1,392 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<title>Gesture Volume Control</title>
-
-<link rel="stylesheet" href="/static/style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Volume Control - Modern Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-
-<h1>Gesture Volume Control</h1>
-
-<div class="buttons">
-
-<button class="start-btn" onclick="startCamera()">Start</button>
-<button class="stop-btn" onclick="stopCamera()">Stop</button>
-
-</div>
-
-<div id="cameraSection" style="display: none;">
-
-    <h2>Webcam Preview</h2>
-
-    <div class="cam-container">
-        <div class="cam">
-            <img id="video" width="500">
-        </div>
-
-
-        <div class="volume-vertical" id="volumeBox" style="display:none;">
-            <div id="volume-fill"></div>
-        </div>
-    </div>
-
-    <h2>Volume : <span id="vol">0</span>%</h2>
-    <div class="bar">
-    <div id="progress">
-</div>
-
-</div>
-
-
-<div class="guide">
-    <h2>🖐 Gesture Guide</h2>
+    <!-- Background Grid -->
+    <div class="bg-grid"></div>
     
-    <div class="gesture-box">
-        <p>🤏 Thumb & Index Close</p>
-        <span>Decrease Volume 🔉</span>
-    </div>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="url(#grad1)" stroke-width="2"/>
+                        <path d="M10 13H13L17 10V22L13 19H10V13Z" stroke="url(#grad1)" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M20 13C21.5 14.2 21.5 17.8 20 19" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M22.5 10.5C25.5 13.2 25.5 18.8 22.5 21.5" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#0EA5A4;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#38BDF8;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="app-title-group">
+                    <h1 class="app-title">Hand Gesture Volume Control</h1>
+                    <p class="app-subtitle">Gesture-Controlled Audio</p>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Ready</span>
+                </div>
+            </div>
+        </header>
 
-    <div class="gesture-box">
-        <p>👌 Thumb & Index Apart</p>
-        <span>Increase Volume 🔊</span>
+        <!-- Control Panel -->
+        <div class="action-panel">
+            <button class="btn btn-primary" onclick="startCamera()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                <span>Start Camera</span>
+            </button>
+            <button class="btn btn-secondary" onclick="stopCamera()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                </svg>
+                <span>Stop</span>
+            </button>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="cameraSection" style="display: none;" class="dashboard">
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Camera Feed Card -->
+                    <div class="card camera-card">
+                        <div class="card-header">
+                            <h2>Camera Feed</h2>
+                            <div class="header-controls">
+                                <span class="live-indicator">
+                                    <span class="live-dot"></span>
+                                    <span>LIVE</span>
+                                </span>
+                                <div class="info-badges">
+                                    <span class="badge" id="fpsBadge">FPS: 30</span>
+                                    <span class="badge" id="gestureStatus">No Hand</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="camera-viewport">
+                            <img id="video" class="video-stream" />
+                        </div>
+                    </div>
+
+                    <!-- Volume Control Card -->
+                    <div class="card volume-control-card">
+                        <h3 class="card-title">Volume Control</h3>
+                        
+                        <div class="volume-display-section">
+                            <div class="volume-value-box">
+                                <span class="volume-value" id="vol">0</span>
+                                <span class="volume-unit">%</span>
+                            </div>
+                            <div class="volume-icon-large">🔊</div>
+                        </div>
+                        
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progress"></div>
+                            <div class="progress-markers">
+                                <span class="marker" style="left: 0%">0</span>
+                                <span class="marker" style="left: 25%">25</span>
+                                <span class="marker" style="left: 50%">50</span>
+                                <span class="marker" style="left: 75%">75</span>
+                                <span class="marker" style="left: 100%">100</span>
+                            </div>
+                        </div>
+                        
+                        <div class="volume-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Min</span>
+                                <span class="stat-value">0%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Current</span>
+                                <span class="stat-value" id="currentVol">0%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Max</span>
+                                <span class="stat-value">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <!-- Volume Trend Chart -->
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>Volume Trend</h3>
+                            <span class="chart-period">Last 30s</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="volumeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Gesture Guide Card -->
+                    <div class="card gesture-card">
+                        <div class="card-header">
+                            <h3>Gesture Guide</h3>
+                            <span class="gesture-count">2 Gestures</span>
+                        </div>
+                        
+                        <div class="gesture-list">
+                            <div class="gesture-row decrease">
+                                <div class="gesture-visual">
+                                    <span class="gesture-icon">🤏</span>
+                                </div>
+                                <div class="gesture-info">
+                                    <h4>Pinch to Decrease</h4>
+                                    <p>Bring thumb & index finger together</p>
+                                </div>
+                                <div class="gesture-action">
+                                    <span class="action-icon">🔉</span>
+                                </div>
+                            </div>
+                            
+                            <div class="gesture-row increase">
+                                <div class="gesture-visual">
+                                    <span class="gesture-icon">👌</span>
+                                </div>
+                                <div class="gesture-info">
+                                    <h4>Spread to Increase</h4>
+                                    <p>Move thumb & index finger apart</p>
+                                </div>
+                                <div class="gesture-action">
+                                    <span class="action-icon">🔊</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
 
 
 <script>
+let volumeChart = null;
+let volumeHistory = [];
+const maxDataPoints = 30;
+let frameCount = 0;
+let lastFpsTime = Date.now();
 
-function startCamera(){
-    fetch("/start");  
-
-    document.getElementById("video").src = "/video";
-
-    document.getElementById("cameraSection").style.display = "block";
-
-    document.querySelector(".start-btn").disabled = true;
-    document.querySelector(".stop-btn").disabled = false;
+// Initialize chart with enhanced styling
+function initChart() {
+    const ctx = document.getElementById('volumeChart').getContext('2d');
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(14, 165, 164, 0.34)');
+    gradient.addColorStop(0.5, 'rgba(56, 189, 248, 0.12)');
+    gradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
+    
+    // Create dynamic labels (0s to 30s)
+    const labels = Array(maxDataPoints).fill('').map((_, i) => {
+        const seconds = i - maxDataPoints + 1;
+        return seconds < 0 ? seconds + 's' : '0s';
+    });
+    
+    volumeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Volume Level',
+                data: Array(maxDataPoints).fill(0),
+                borderColor: '#0EA5A4',
+                borderWidth: 3,
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#F59E0B',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#38BDF8',
+                    borderColor: '#0EA5A4',
+                    borderWidth: 1,
+                    padding: 12,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Volume: ' + Math.round(context.parsed.y) + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        color: '#94A3B8',
+                        font: { size: 11, weight: '500' },
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(100, 116, 139, 0.1)',
+                        drawBorder: false,
+                        lineWidth: 1
+                    }
+                },
+                x: {
+                    ticks: { color: '#94A3B8' },
+                    grid: { color: 'rgba(100, 116, 139, 0.05)', drawBorder: false }
+                }
+            }
+        }
+    });
 }
 
+// Update chart with new volume data
+function updateChart(volume) {
+    volumeHistory.push(volume);
+    if (volumeHistory.length > maxDataPoints) {
+        volumeHistory.shift();
+    }
+    
+    if (volumeChart) {
+        // Update data
+        volumeChart.data.datasets[0].data = volumeHistory;
+        
+        // Update labels dynamically
+        const currentLength = volumeHistory.length;
+        const labels = Array(maxDataPoints).fill('').map((_, i) => {
+            const offset = i - maxDataPoints + 1;
+            if (offset === 0) return 'Now';
+            if (offset % 5 === 0) return offset + 's';
+            return '';
+        });
+        volumeChart.data.labels = labels;
+        
+        volumeChart.update('none');
+    }
+}
+
+// Update FPS counter
+function updateFPS() {
+    fetch("/fps")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('fpsBadge').textContent = 'FPS: ' + data.fps;
+    });
+}
+
+// Start camera
+function startCamera(){
+    fetch("/start");  
+    document.getElementById("video").src = "/video";
+    document.getElementById("cameraSection").style.display = "block";
+    
+    document.querySelector('.btn-primary').disabled = true;
+    document.querySelector('.btn-secondary').disabled = false;
+    
+    // Update status
+    const statusBadge = document.getElementById('statusBadge');
+    statusBadge.innerHTML = '<span class="status-dot"></span><span class="status-text">Live</span>';
+    
+    // Initialize chart on first start
+    if (!volumeChart) {
+        setTimeout(initChart, 100);
+    }
+    
+    // Start FPS counter
+    setInterval(updateFPS, 500);
+}
+
+// Stop camera
 function stopCamera(){
     fetch("/stop");
     document.getElementById("video").src="";
-
-    // hide volume bar
     document.getElementById("cameraSection").style.display = "none";
-
-    // button control
-    document.querySelector(".start-btn").disabled = false;
-    document.querySelector(".stop-btn").disabled = true;
+    
+    document.querySelector('.btn-primary').disabled = false;
+    document.querySelector('.btn-secondary').disabled = true;
+    
+    // Update status
+    const statusBadge = document.getElementById('statusBadge');
+    statusBadge.innerHTML = '<span class="status-dot"></span><span class="status-text">Ready</span>';
+    
+    // Reset chart
+    volumeHistory = [];
+    if (volumeChart) {
+        volumeChart.destroy();
+        volumeChart = null;
+    }
+    
+    // Reset gestures
+    document.getElementById('gestureStatus').textContent = 'No Hand';
 }
+
+// Main volume update loop
 setInterval(() => {
     fetch("/volume")
     .then(res => res.json())
     .then(data => {
-
         let vol = data.volume;
-
+        
+        // Update volume display
         document.getElementById("vol").innerText = vol;
+        document.getElementById("currentVol").innerText = vol + '%';
+        
+        // Update progress bars
         document.getElementById("progress").style.width = vol + "%";
-        document.getElementById("volume-fill").style.height = vol + "%";
-
+        
+        // Update chart
+        updateChart(vol);
+    });
+    
+    // Update FPS
+    updateFPS();
+    
+    // Update gesture status
+    fetch("/gesture")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('gestureStatus').textContent = data.status;
     });
 }, 500);
 
-document.querySelector(".stop-btn").disabled = true
-
-
+// Initialize button states
+document.querySelector('.btn-secondary').disabled = true;
 </script>
 
 </body>
